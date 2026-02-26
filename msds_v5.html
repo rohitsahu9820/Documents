@@ -21,9 +21,11 @@ header p{font-size:11px;opacity:.65;}
 .sb-item{display:flex;align-items:center;gap:7px;padding:6px 9px;border-radius:7px;font-size:11px;font-weight:500;border:1.5px solid var(--border);background:white;margin-bottom:4px;transition:all .15s;user-select:none;}
 .sb-item:hover{border-color:var(--teal);}
 .sb-item.off{opacity:.38;background:#f0f0f0;}
+.sb-item.locked-item .sb-num{background:var(--teal-dark);}
 .sb-num{width:20px;height:20px;background:var(--teal);color:white;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .sb-item.off .sb-num{background:#aaa;}
 .sb-label{flex:1;font-size:10px;line-height:1.3;}
+.sb-lock{font-size:10px;opacity:.6;}
 .tog{position:relative;width:28px;height:15px;flex-shrink:0;}
 .tog input{opacity:0;width:0;height:0;}
 .tog-track{position:absolute;inset:0;background:#ccc;border-radius:15px;cursor:pointer;transition:.2s;}
@@ -36,13 +38,25 @@ input:checked+.tog-track:before{transform:translateX(13px);}
 .tbtn:hover{border-color:var(--teal);color:var(--teal);}
 .sec-card{background:white;border-radius:10px;border:1.5px solid var(--border);margin-bottom:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:opacity .2s,filter .2s;}
 .sec-card.off{opacity:.35;pointer-events:none;filter:grayscale(1);}
+/* Editable section header = teal */
 .sec-hdr{background:var(--teal);color:white;padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
 .sec-hdr:hover{filter:brightness(1.1);}
+/* Locked section header = darker teal with lock icon */
+.sec-hdr.locked-hdr{background:var(--teal-dark);}
+.lock-badge{background:rgba(255,255,255,.18);color:white;font-size:9px;padding:2px 8px;border-radius:10px;letter-spacing:.5px;white-space:nowrap;}
 .sec-hdr h3{flex:1;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;}
 .chevron{transition:transform .2s;}
 .sec-hdr.open .chevron{transform:rotate(180deg);}
 .sec-body{display:none;padding:18px 16px;}
 .sec-body.open{display:block;}
+/* LOCKED SECTION BODY */
+.locked-banner{background:#e8f5f7;border:1.5px solid #b0dde4;border-radius:7px;padding:9px 14px;font-size:11px;color:#155f6d;margin-bottom:14px;display:flex;align-items:flex-start;gap:8px;line-height:1.5;}
+.lk-body{display:flex;flex-direction:column;gap:0;}
+.lk-row{display:grid;grid-template-columns:220px 1fr;gap:0;border-bottom:1px solid #eef1f5;padding:9px 4px;}
+.lk-row:last-child{border-bottom:none;}
+.lk-label{font-size:11px;font-weight:700;color:var(--teal-dark);padding-right:12px;line-height:1.5;}
+.lk-val{font-size:12px;color:#2a2a2a;line-height:1.7;}
+/* EDITABLE FIELDS */
 .row{display:grid;gap:12px;margin-bottom:12px;}
 .r1{grid-template-columns:1fr;}
 .r2{grid-template-columns:1fr 1fr;}
@@ -62,7 +76,6 @@ textarea{resize:vertical;min-height:62px;line-height:1.5;}
 .tbl-outer td input{border:none;background:transparent;padding:3px 4px;font-size:11px;width:100%;font-family:'Inter',sans-serif;}
 .tbl-outer td input:focus{background:#eef8fa;border-radius:4px;outline:none;}
 .tbl-outer tr:hover td{background:#f7fbfc;}
-.tbl-outer table th:nth-child(1){min-width:80px;}
 .btm{position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid var(--border);padding:11px 28px;display:flex;gap:10px;align-items:center;justify-content:flex-end;box-shadow:0 -4px 16px rgba(0,0,0,.09);z-index:200;}
 .status{font-size:11px;color:var(--muted);margin-right:auto;font-style:italic;}
 .btn{padding:9px 22px;border-radius:7px;font-size:12.5px;font-weight:600;font-family:'Inter',sans-serif;cursor:pointer;border:none;transition:all .2s;}
@@ -73,7 +86,7 @@ textarea{resize:vertical;min-height:62px;line-height:1.5;}
 .btn-gen svg{width:14px;height:14px;}
 .toast{position:fixed;top:70px;right:16px;background:#1e6b3a;color:white;padding:10px 18px;border-radius:7px;font-size:12px;font-weight:500;opacity:0;transform:translateY(-8px);transition:all .3s;z-index:999;pointer-events:none;}
 .toast.show{opacity:1;transform:translateY(0);}
-@media(max-width:680px){.sidebar{display:none;}.r2,.r3,.r4{grid-template-columns:1fr;}}
+@media(max-width:680px){.sidebar{display:none;}.r2,.r3,.r4{grid-template-columns:1fr;}.lk-row{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
@@ -94,7 +107,10 @@ textarea{resize:vertical;min-height:62px;line-height:1.5;}
         <button class="tbtn" onclick="toggleAll(false)">Collapse All</button>
         <button class="tbtn" onclick="enableAll()">Enable All</button>
       </div>
-      <span style="font-size:11px;color:var(--muted);"><span id="cnt" style="font-weight:700;color:var(--teal);">16</span> sections active</span>
+      <span style="font-size:11px;color:var(--muted);">
+        <span id="cnt" style="font-weight:700;color:var(--teal);">16</span> sections active
+        &nbsp;&nbsp;<span style="color:#888;font-size:10px;">&#128274; = standard locked</span>
+      </span>
     </div>
     <div id="secContainer"></div>
   </div>
@@ -112,11 +128,10 @@ const LOGO_B64 = `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAlgCWAAD/2wBDAAMCAgM
 
 const SECTIONS = [
   {
-    id:'s1', num:'1',
+    id:'s1', num:'1', locked:false,
     title:'Identification of the Substance/Mixture and of the Company/Undertaking',
     short:'Identification',
-    html:`
-      <div class="row r3">
+    html:`<div class="row r3">
         <div class="field"><label>Date of Issue</label><input type="date" id="s1_doi"></div>
         <div class="field"><label>Date of Revision</label><input type="date" id="s1_dor"></div>
         <div class="field"><label>Version</label><input type="text" id="s1_ver" placeholder="e.g. 1.0"></div>
@@ -154,17 +169,19 @@ const SECTIONS = [
       </div>`
   },
   {
-    id:'s2', num:'2', title:'Hazards Identification', short:'Hazards ID',
-    html:`
-      <div class="row r1"><div class="field"><label>2.1 Classification of the Substance or Mixture (GHS/CLP)</label><textarea id="s2_class" placeholder="e.g. The product is not classified as dangerous according to GHS..."></textarea></div></div>
+    id:'s2', num:'2', locked:false,
+    title:'Hazards Identification',
+    short:'Hazards ID',
+    html:`<div class="row r1"><div class="field"><label>2.1 Classification of the Substance or Mixture (GHS/CLP)</label><textarea id="s2_class" placeholder="e.g. The product is not classified as dangerous according to GHS..."></textarea></div></div>
       <div class="row r1"><div class="field"><label>2.2 Label Elements (Signal Word, Hazard / Precautionary Statements)</label><textarea id="s2_label" placeholder="e.g. No signal word. No hazard statements."></textarea></div></div>
       <div class="row r1"><div class="field"><label>GHS Pictograms</label><input type="text" id="s2_pict" placeholder="e.g. None / GHS07 / GHS08 ..."></div></div>
       <div class="row r1"><div class="field"><label>2.3 Other Hazards (PBT / vPvB / Endocrine Disruptors)</label><textarea id="s2_other" placeholder="e.g. Non-applicable"></textarea></div></div>`
   },
   {
-    id:'s3', num:'3', title:'Composition / Information on Ingredients', short:'Composition',
-    html:`
-      <div class="row r2">
+    id:'s3', num:'3', locked:false,
+    title:'Composition / Information on Ingredients',
+    short:'Composition',
+    html:`<div class="row r2">
         <div class="field"><label>3.1 Substances – Chemical Description</label><input type="text" id="s3_desc" placeholder="e.g. Colourants"></div>
         <div class="field"><label>3.2 Mixtures</label><input type="text" id="s3_mix" value="Non-applicable"></div>
       </div>
@@ -206,57 +223,53 @@ const SECTIONS = [
       </div>`
   },
   {
-    id:'s4', num:'4', title:'First Aid Measures', short:'First Aid',
-    html:`
-      <div class="row r1"><div class="field"><label>4.1 Description of First Aid Measures (General)</label><textarea id="s4_gen" placeholder="Consult a doctor in case of discomfort..."></textarea></div></div>
-      <div class="row r2">
-        <div class="field"><label>By Inhalation</label><textarea id="s4_inh" placeholder="In case of symptoms, move person into fresh air..."></textarea></div>
-        <div class="field"><label>By Skin Contact</label><textarea id="s4_skin" placeholder="Clean affected area with water and neutral soap..."></textarea></div>
-      </div>
-      <div class="row r2">
-        <div class="field"><label>By Eye Contact</label><textarea id="s4_eye" placeholder="Rinse with water until product eliminated..."></textarea></div>
-        <div class="field"><label>By Ingestion / Aspiration</label><textarea id="s4_ing" placeholder="Seek medical assistance for large quantities..."></textarea></div>
-      </div>
-      <div class="row r1"><div class="field"><label>4.2 Most Important Symptoms and Effects (Acute and Delayed)</label><textarea id="s4_sym" placeholder="Acute and delayed effects indicated in sections 2 and 11..."></textarea></div></div>
-      <div class="row r1"><div class="field"><label>4.3 Indication of Immediate Medical Attention / Special Treatment</label><textarea id="s4_med" placeholder="Non-applicable"></textarea></div></div>`
+    id:'s4', num:'4', locked:true,
+    title:'First Aid Measures',
+    short:'First Aid',
+    html:`<div class="locked-banner">&#128274;&nbsp; Standard regulatory content &mdash; read-only. Toggle the section off in the sidebar to exclude it from the PDF.</div>
+<div class="lk-body"><div class="lk-row"><div class="lk-label">4.1. Description of first aid measures</div><div class="lk-val">Consult a doctor in case of discomfort. <b>By inhalation:</b> Move the person into fresh air. If symptoms persist, seek medical attention. <b>By skin contact:</b> Clean the affected area thoroughly with water and neutral soap. If irritation, redness or rashes occur, seek medical advice. <b>By eye contact:</b> Rinse with water for at least 15 minutes until product is fully eliminated. Consult a doctor if problem persists. <b>By ingestion/aspiration:</b> Do not induce vomiting. In case of consumption in large quantities seek medical assistance immediately.</div></div>
+<div class="lk-row"><div class="lk-label">4.2. Most important symptoms and effects, both acute and delayed</div><div class="lk-val">Acute and delayed effects are indicated in sections 2 and 11. No significant acute effects expected under normal conditions of use.</div></div>
+<div class="lk-row"><div class="lk-label">4.3. Indication of any immediate medical attention and special treatment needed</div><div class="lk-val">Non-applicable</div></div>
+</div>`
   },
   {
-    id:'s5', num:'5', title:'Firefighting Measures', short:'Firefighting',
-    html:`
-      <div class="row r2">
-        <div class="field"><label>5.1.1 Suitable Extinguishing Media</label><textarea id="s5_suit" placeholder="ABC Powder, water, CO2..."></textarea></div>
-        <div class="field"><label>5.1.2 Unsuitable Extinguishing Media</label><textarea id="s5_unsuit" placeholder="Non-applicable"></textarea></div>
-      </div>
-      <div class="row r1"><div class="field"><label>5.2 Special Hazards Arising from the Substance or Mixture</label><textarea id="s5_haz" placeholder="Due to its non-flammable nature, does not present a fire risk..."></textarea></div></div>
-      <div class="row r1"><div class="field"><label>5.3 Advice for Firefighters</label><textarea id="s5_adv" placeholder="Use full protective clothing and individual respiratory equipment..."></textarea></div></div>`
+    id:'s5', num:'5', locked:true,
+    title:'Firefighting Measures',
+    short:'Firefighting',
+    html:`<div class="locked-banner">&#128274;&nbsp; Standard regulatory content &mdash; read-only. Toggle the section off in the sidebar to exclude it from the PDF.</div>
+<div class="lk-body"><div class="lk-row"><div class="lk-label">5.1.1. Suitable extinguishing media</div><div class="lk-val">Product is non-flammable. Any type of extinguishing agent can be used (ABC Powder, water, CO₂, foam).</div></div>
+<div class="lk-row"><div class="lk-label">5.1.2. Unsuitable extinguishing media</div><div class="lk-val">Non-applicable</div></div>
+<div class="lk-row"><div class="lk-label">5.2. Special hazards arising from the substance or mixture</div><div class="lk-val">Due to its non-flammable nature, the product does not present a fire risk under normal conditions of storage, manipulation and use.</div></div>
+<div class="lk-row"><div class="lk-label">5.3. Advice for firefighters</div><div class="lk-val">Use full protective clothing and individual respiratory equipment. Refrigerate storage containers in case of fire. Act in accordance with the Internal Emergency Plan. Avoid spillage of the extinguishing products into an aqueous medium.</div></div>
+</div>`
   },
   {
-    id:'s6', num:'6', title:'Accidental Release Measures', short:'Accidental Release',
-    html:`
-      <div class="row r2">
-        <div class="field"><label>6.1.1 For Non-Emergency Personnel</label><textarea id="s6_non" placeholder="Sweep up and shovel product into container for reuse or disposal..."></textarea></div>
-        <div class="field"><label>6.1.2 For Emergency Responders</label><textarea id="s6_emr" placeholder="Wear protective equipment. Keep unprotected persons away..."></textarea></div>
-      </div>
-      <div class="row r1"><div class="field"><label>6.2 Environmental Precautions</label><textarea id="s6_env" placeholder="Keep product away from drains, surface and underground water..."></textarea></div></div>
-      <div class="row r1"><div class="field"><label>6.3 Methods and Material for Containment and Cleaning Up</label><textarea id="s6_meth" placeholder="Sweep up and place in container for reuse or disposal..."></textarea></div></div>
-      <div class="row r1"><div class="field"><label>6.4 Reference to Other Sections</label><input type="text" id="s6_ref" value="See sections 8 and 13."></div></div>`
+    id:'s6', num:'6', locked:true,
+    title:'Accidental Release Measures',
+    short:'Accidental Release',
+    html:`<div class="locked-banner">&#128274;&nbsp; Standard regulatory content &mdash; read-only. Toggle the section off in the sidebar to exclude it from the PDF.</div>
+<div class="lk-body"><div class="lk-row"><div class="lk-label">6.1.1. For non-emergency personnel</div><div class="lk-val">Avoid raising dust. Sweep up and shovel product and place in a container for reuse (preferred) or disposal. Wear appropriate PPE (see section 8).</div></div>
+<div class="lk-row"><div class="lk-label">6.1.2. For emergency responders</div><div class="lk-val">Wear full protective equipment. Keep unprotected persons away. Ensure adequate ventilation. See section 8.</div></div>
+<div class="lk-row"><div class="lk-label">6.2. Environmental precautions</div><div class="lk-val">Not classified as hazardous to the environment. Keep product away from drains, surface and underground water. Do not allow to enter sewers or watercourses.</div></div>
+<div class="lk-row"><div class="lk-label">6.3. Methods and material for containment and cleaning up</div><div class="lk-val">Sweep up or vacuum up the spilled product. Collect in a sealed container for reuse or disposal in accordance with local regulations. Clean the affected area with water.</div></div>
+<div class="lk-row"><div class="lk-label">6.4. Reference to other sections</div><div class="lk-val">See sections 8 and 13 for further information on personal protection and disposal.</div></div>
+</div>`
   },
   {
-    id:'s7', num:'7', title:'Handling and Storage', short:'Handling & Storage',
-    html:`
-      <div class="row r1"><div class="field"><label>7.1 Precautions for Safe Handling</label><textarea id="s7_hand" placeholder="Comply with legislation on industrial risks. Maintain order and cleanliness..."></textarea></div></div>
-      <div class="row r3">
-        <div class="field"><label>Min. Storage Temp (°C)</label><input type="text" id="s7_min" value="5"></div>
-        <div class="field"><label>Max. Storage Temp (°C)</label><input type="text" id="s7_max" value="30"></div>
-        <div class="field"><label>Storage Incompatibilities</label><input type="text" id="s7_incompat" placeholder="Avoid strong acids, heat, radiation..."></div>
-      </div>
-      <div class="row r1"><div class="field"><label>7.2 Conditions for Safe Storage (Additional)</label><textarea id="s7_stor" placeholder="Avoid sources of heat, radiation, static electricity and contact with food..."></textarea></div></div>
-      <div class="row r1"><div class="field"><label>7.3 Specific End Use(s)</label><textarea id="s7_end" placeholder="Except for the instructions already specified..."></textarea></div></div>`
+    id:'s7', num:'7', locked:true,
+    title:'Handling and Storage',
+    short:'Handling & Storage',
+    html:`<div class="locked-banner">&#128274;&nbsp; Standard regulatory content &mdash; read-only. Toggle the section off in the sidebar to exclude it from the PDF.</div>
+<div class="lk-body"><div class="lk-row"><div class="lk-label">7.1. Precautions for safe handling</div><div class="lk-val">Comply with current legislation on prevention of industrial risks. Maintain order and cleanliness. Do not eat, drink or smoke during use. Wash hands thoroughly after handling. Avoid generating dust. Ensure adequate ventilation.</div></div>
+<div class="lk-row"><div class="lk-label">7.2. Conditions for safe storage, including any incompatibilities</div><div class="lk-val">Store in a cool, dry, well-ventilated place away from sources of heat, radiation and static electricity. Keep containers tightly closed. Min. storage temperature: 5 °C. Max. storage temperature: 30 °C. Avoid contact with: strong acids, strong oxidising agents.</div></div>
+<div class="lk-row"><div class="lk-label">7.3. Specific end use(s)</div><div class="lk-val">Except for the instructions already specified it is not necessary to provide any special recommendation regarding the uses of this product. See section 1.2 for identified uses.</div></div>
+</div>`
   },
   {
-    id:'s8', num:'8', title:'Exposure Controls / Personal Protection', short:'Exposure Controls',
-    html:`
-      <div class="sub-ttl">8.1 Control Parameters – DNEL Values</div>
+    id:'s8', num:'8', locked:false,
+    title:'Exposure Controls / Personal Protection',
+    short:'Exposure Controls',
+    html:`<div class="sub-ttl">8.1 Control Parameters – DNEL Values</div>
       <div class="tbl-wrap">
         <table>
           <thead>
@@ -337,9 +350,10 @@ const SECTIONS = [
       <div class="row r1"><div class="field"><label>8.2.3 Environmental Exposure Controls</label><textarea id="s8_env" placeholder="Avoid environmental spillage of both the product and its container..."></textarea></div></div>`
   },
   {
-    id:'s9', num:'9', title:'Physical and Chemical Properties', short:'Physical & Chemical',
-    html:`
-      <div class="sub-ttl">9.1 Basic Physical and Chemical Properties</div>
+    id:'s9', num:'9', locked:false,
+    title:'Physical and Chemical Properties',
+    short:'Physical & Chemical',
+    html:`<div class="sub-ttl">9.1 Basic Physical and Chemical Properties</div>
       <div class="tbl-wrap">
         <table>
           <thead><tr><th>#</th><th>Parameter</th><th>Value / Test Method / Remarks</th></tr></thead>
@@ -372,25 +386,23 @@ const SECTIONS = [
       </div>`
   },
   {
-    id:'s10', num:'10', title:'Stability and Reactivity', short:'Stability',
-    html:`
-      <div class="row r2">
-        <div class="field"><label>10.1 Reactivity</label><textarea id="s10_r" placeholder="No hazardous reactions expected under recommended storage conditions..."></textarea></div>
-        <div class="field"><label>10.2 Chemical Stability</label><textarea id="s10_cs" placeholder="Chemically stable under indicated conditions of storage, handling and use..."></textarea></div>
-      </div>
-      <div class="row r2">
-        <div class="field"><label>10.3 Possibility of Hazardous Reactions</label><textarea id="s10_hr" placeholder="No hazardous reactions that lead to excessive temperatures or pressure expected..."></textarea></div>
-        <div class="field"><label>10.4 Conditions to Avoid</label><textarea id="s10_ca" placeholder="Shock and friction, contact with air, increase in temperature, sunlight..."></textarea></div>
-      </div>
-      <div class="row r2">
-        <div class="field"><label>10.5 Incompatible Materials</label><textarea id="s10_im" placeholder="Avoid strong acids. Oxidising agents, combustible materials..."></textarea></div>
-        <div class="field"><label>10.6 Hazardous Decomposition Products</label><textarea id="s10_dp" placeholder="Carbon dioxide (CO2), carbon monoxide and other organic compounds..."></textarea></div>
-      </div>`
+    id:'s10', num:'10', locked:true,
+    title:'Stability and Reactivity',
+    short:'Stability',
+    html:`<div class="locked-banner">&#128274;&nbsp; Standard regulatory content &mdash; read-only. Toggle the section off in the sidebar to exclude it from the PDF.</div>
+<div class="lk-body"><div class="lk-row"><div class="lk-label">10.1. Reactivity</div><div class="lk-val">No hazardous reactions are expected because the product is stable under recommended storage conditions. See section 7.</div></div>
+<div class="lk-row"><div class="lk-label">10.2. Chemical stability</div><div class="lk-val">Chemically stable under the indicated conditions of storage, handling and use.</div></div>
+<div class="lk-row"><div class="lk-label">10.3. Possibility of hazardous reactions</div><div class="lk-val">Under the specified conditions, hazardous reactions that lead to excessive temperatures or pressure are not expected.</div></div>
+<div class="lk-row"><div class="lk-label">10.4. Conditions to avoid</div><div class="lk-val">Shock and friction: Not applicable. Contact with air: Not applicable. Increase in temperature: Avoid exceeding storage limits. Sunlight: Not applicable.</div></div>
+<div class="lk-row"><div class="lk-label">10.5. Incompatible materials</div><div class="lk-val">Strong acids: Avoid. Oxidising agents: Not applicable. Combustible materials: Not applicable.</div></div>
+<div class="lk-row"><div class="lk-label">10.6. Hazardous decomposition products</div><div class="lk-val">Depending on decomposition conditions, complex mixtures can be released: carbon dioxide (CO₂), carbon monoxide and other organic compounds.</div></div>
+</div>`
   },
   {
-    id:'s11', num:'11', title:'Toxicological Information', short:'Toxicology',
-    html:`
-      <div class="row r2">
+    id:'s11', num:'11', locked:false,
+    title:'Toxicological Information',
+    short:'Toxicology',
+    html:`<div class="row r2">
         <div class="field"><label>11.1 Hazard Classification Info (Regulation EC No 1272/2008)</label><textarea id="s11_haz" placeholder="LD50 oral > 5000 mg/kg (rat)..."></textarea></div>
         <div class="field"><label>11.1.1 Summaries of Test Information</label><textarea id="s11_sum" placeholder="Based on available data, classification criteria are not met..."></textarea></div>
       </div>
@@ -409,9 +421,10 @@ const SECTIONS = [
       </div>`
   },
   {
-    id:'s12', num:'12', title:'Ecological Information', short:'Ecological',
-    html:`
-      <div class="row r2">
+    id:'s12', num:'12', locked:false,
+    title:'Ecological Information',
+    short:'Ecological',
+    html:`<div class="row r2">
         <div class="field"><label>12.1 Toxicity</label><textarea id="s12_tox" placeholder="Not available"></textarea></div>
         <div class="field"><label>12.2 Persistence and Degradability</label><textarea id="s12_deg" placeholder="Not available"></textarea></div>
       </div>
@@ -426,91 +439,93 @@ const SECTIONS = [
       </div>`
   },
   {
-    id:'s13', num:'13', title:'Disposal Considerations', short:'Disposal',
-    html:`
-      <div class="row r2">
-        <div class="field"><label>13.1.1 Disposal of the Product</label><textarea id="s13_prod" placeholder="Consult the authorized waste service manager..."></textarea></div>
-        <div class="field"><label>13.1.2 Disposal of the Packaging</label><textarea id="s13_pack" placeholder="Container processed the same way if in contact with product, otherwise non-dangerous residue..."></textarea></div>
-      </div>
-      <div class="row r2">
-        <div class="field"><label>13.1.3 Physical/Chemical Properties Affecting Waste Treatment</label><textarea id="s13_prop" placeholder="Non-applicable"></textarea></div>
-        <div class="field"><label>13.1.4 Sewage Disposal</label><textarea id="s13_sew" placeholder="Waste should not be disposed of to drains..."></textarea></div>
-      </div>
-      <div class="row r1"><div class="field"><label>13.1.5 Special Precautions for Waste Treatment</label><textarea id="s13_spec" placeholder="Refer to national and local regulations on waste management..."></textarea></div></div>`
+    id:'s13', num:'13', locked:true,
+    title:'Disposal Considerations',
+    short:'Disposal',
+    html:`<div class="locked-banner">&#128274;&nbsp; Standard regulatory content &mdash; read-only. Toggle the section off in the sidebar to exclude it from the PDF.</div>
+<div class="lk-body"><div class="lk-row"><div class="lk-label">13.1.1. Information regarding the disposal of the product</div><div class="lk-val">Consult the authorized waste service manager on the assessment and disposal operations. Do not dispose of product into drains or the environment.</div></div>
+<div class="lk-row"><div class="lk-label">13.1.2. Information regarding the disposal of the packaging</div><div class="lk-val">Containers that have been in direct contact with the product are processed the same way as the product itself. Otherwise, treated as non-dangerous residue in accordance with local regulations.</div></div>
+<div class="lk-row"><div class="lk-label">13.1.3. Physical/chemical properties that may affect waste treatment options</div><div class="lk-val">Non-applicable</div></div>
+<div class="lk-row"><div class="lk-label">13.1.4. Sewage disposal</div><div class="lk-val">Waste should not be disposed of to drains. See subsection 6.2.</div></div>
+<div class="lk-row"><div class="lk-label">13.1.5. Special precautions for any recommended waste treatment</div><div class="lk-val">Refer to national and local regulations on waste management. Consult relevant authorities before disposing.</div></div>
+</div>`
   },
   {
-    id:'s14', num:'14', title:'Transport Information', short:'Transport',
-    html:`
-      <div class="row r2">
-        <div class="field"><label>14.1 UN Number or ID Number</label><input type="text" id="s14_un" value="Non-applicable"></div>
-        <div class="field"><label>14.2 UN Proper Shipping Name</label><input type="text" id="s14_name" value="Not regulated"></div>
-      </div>
-      <div class="row r2">
-        <div class="field"><label>14.3 Transport Hazard Class(es)</label><input type="text" id="s14_class" value="Not applicable. Not classified as dangerous for transport."></div>
-        <div class="field"><label>14.4 Packing Group</label><input type="text" id="s14_pg" value="Not regulated"></div>
-      </div>
-      <div class="row r2">
-        <div class="field"><label>14.5 Environmental Hazards</label><input type="text" id="s14_env" value="Prevent disposal into the drains."></div>
-        <div class="field"><label>14.6 Special Precautions for User</label><textarea id="s14_spec" placeholder="Non-applicable"></textarea></div>
-      </div>
-      <div class="row r1"><div class="field"><label>14.7 Maritime Transport in Bulk According to IMO Instruments</label><textarea id="s14_imo" placeholder="Non-applicable"></textarea></div></div>`
+    id:'s14', num:'14', locked:true,
+    title:'Transport Information',
+    short:'Transport',
+    html:`<div class="locked-banner">&#128274;&nbsp; Standard regulatory content &mdash; read-only. Toggle the section off in the sidebar to exclude it from the PDF.</div>
+<div class="lk-body"><div class="lk-row"><div class="lk-label">14.1. UN number or ID number</div><div class="lk-val">Non-applicable — not classified as hazardous for transport.</div></div>
+<div class="lk-row"><div class="lk-label">14.2. UN proper shipping name</div><div class="lk-val">Not regulated</div></div>
+<div class="lk-row"><div class="lk-label">14.3. Transport hazard class(es)</div><div class="lk-val">Not applicable. Not classified as dangerous for transport per ADR/RID (Land), IMDG (Marine), ICAO/IATA (Air) and DOT.</div></div>
+<div class="lk-row"><div class="lk-label">14.4. Packing group</div><div class="lk-val">Not regulated</div></div>
+<div class="lk-row"><div class="lk-label">14.5. Environmental hazards</div><div class="lk-val">Prevent disposal into drains or watercourses.</div></div>
+<div class="lk-row"><div class="lk-label">14.6. Special precautions for user</div><div class="lk-val">Non-applicable</div></div>
+<div class="lk-row"><div class="lk-label">14.7. Maritime transport in bulk according to IMO instruments</div><div class="lk-val">Non-applicable</div></div>
+</div>`
   },
   {
-    id:'s15', num:'15', title:'Regulatory Information', short:'Regulatory',
-    html:`
-      <div class="row r1"><div class="field"><label>15.1 Safety, Health and Environmental Regulations / Legislation</label><textarea id="s15_reg" placeholder="Manufacture, Storage and Import of Hazardous Chemicals Rules 1989; Factories Act 1948; Chemical Accidents Rules 1996; Public Liability Insurance Act 1991..."></textarea></div></div>
+    id:'s15', num:'15', locked:false,
+    title:'Regulatory Information',
+    short:'Regulatory',
+    html:`<div class="row r1"><div class="field"><label>15.1 Safety, Health and Environmental Regulations / Legislation</label><textarea id="s15_reg" placeholder="Manufacture, Storage and Import of Hazardous Chemicals Rules 1989; Factories Act 1948; Chemical Accidents Rules 1996; Public Liability Insurance Act 1991..."></textarea></div></div>
       <div class="row r1"><div class="field"><label>15.2 Chemical Safety Assessment</label><textarea id="s15_csa" placeholder="A Chemical Safety Assessment has / has not been carried out for this substance or mixture..."></textarea></div></div>`
   },
   {
-    id:'s16', num:'16', title:'Other Information', short:'Other Info',
-    html:`
-      <div class="row r2">
-        <div class="field"><label>Safety Data Sheet Prepared By</label><textarea id="s16_prep" placeholder="Name / Department / Company..."></textarea></div>
-        <div class="field"><label>Professional Help / Contact for SDS Queries</label><textarea id="s16_help" placeholder="Phone, email, website..."></textarea></div>
-      </div>
-      <div class="row r1"><div class="field"><label>Legislation / Standards Referenced</label><textarea id="s16_leg" placeholder="GHS Annex 4, COMMISSION REGULATION (EU) 2020/878..."></textarea></div></div>
-      <div class="row r1"><div class="field"><label>Abbreviations and Acronyms</label><textarea id="s16_abbr" rows="4" placeholder="ADR, IMDG, IATA, ICAO, LD50, CL50, EC50, IARC, BCF..."></textarea></div></div>
-      <div class="row r1"><div class="field"><label>Disclaimer</label><textarea id="s16_disc" rows="3" placeholder="The information above is believed to be accurate...">The information above is believed to be accurate and represents the best information currently available to us. However, we make no warranty of merchantability or any other warranty, express or implied, with respect to such information, and we assume no liability resulting from its use.</textarea></div></div>`
+    id:'s16', num:'16', locked:true,
+    title:'Other Information',
+    short:'Other Info',
+    html:`<div class="locked-banner">&#128274;&nbsp; Standard regulatory content &mdash; read-only. Toggle the section off in the sidebar to exclude it from the PDF.</div>
+<div class="lk-body"><div class="lk-row"><div class="lk-label">Legislation. Safety data sheet legislation</div><div class="lk-val">This safety data sheet has been designed in accordance with Annex 4 – Guidance on the preparation of Safety Data Sheets of the Globally Harmonized System of Classification and Labelling of Chemicals (GHS) and COMMISSION REGULATION (EU) 2020/878.</div></div>
+<div class="lk-row"><div class="lk-label">Training. Advice related to training</div><div class="lk-val">Minimal training is recommended to prevent industrial risks for staff using this product, in order to facilitate their comprehension and interpretation of this safety data sheet.</div></div>
+<div class="lk-row"><div class="lk-label">Sources. Principal bibliographical sources</div><div class="lk-val">The United Nations Economic Commission for Europe (UNECE). Globally Harmonized System of Classification and Labelling of Chemicals (GHS).</div></div>
+<div class="lk-row"><div class="lk-label">Abbreviations. Abbreviations and acronyms</div><div class="lk-val">ADR: European agreement on international carriage of dangerous goods by road. IMDG: International maritime dangerous goods code. IATA: International Air Transport Association. ICAO: International Civil Aviation Organisation. LD50: Lethal Dose 50. EC50: Effective concentration 50. IARC: International Agency for Research on Cancer. BCF: Bioconcentration factor. PBT: Persistent, Bioaccumulative and Toxic. vPvB: very Persistent and very Bioaccumulative.</div></div>
+<div class="lk-row"><div class="lk-label">Disclaimer. Disclaimer</div><div class="lk-val">The information above is believed to be accurate and represents the best information currently available to us. However, we make no warranty of merchantability or any other warranty, express or implied, with respect to such information, and we assume no liability resulting from its use. Users should make their own investigations to determine the suitability of the information for their particular purposes.</div></div>
+</div>`
   }
 ];
 
 
-// ── STATE ──
 const enabled = {};
-SECTIONS.forEach(s => enabled[s.id] = true);
+SECTIONS.forEach(function(s){ enabled[s.id] = true; });
 
 function renderSidebar() {
-  const el = document.getElementById('sbList');
+  var el = document.getElementById('sbList');
   el.innerHTML = '';
-  SECTIONS.forEach(s => {
-    const on = enabled[s.id];
-    const d = document.createElement('div');
-    d.className = 'sb-item' + (on ? '' : ' off');
+  SECTIONS.forEach(function(s) {
+    var on = enabled[s.id];
+    var d = document.createElement('div');
+    d.className = 'sb-item' + (on ? '' : ' off') + (s.locked ? ' locked-item' : '');
     d.id = 'sb_' + s.id;
-    d.innerHTML = '<div class="sb-num">' + s.num + '</div><div class="sb-label">' + s.short + '</div>'
+    d.innerHTML = '<div class="sb-num">' + s.num + '</div>'
+      + '<div class="sb-label">' + s.short + '</div>'
+      + (s.locked ? '<span class="sb-lock">&#128274;</span>' : '')
       + '<label class="tog"><input type="checkbox" ' + (on ? 'checked' : '') + ' onchange="setEnabled(\'' + s.id + '\',this.checked)"><div class="tog-track"></div></label>';
     el.appendChild(d);
   });
 }
 
 function renderSections() {
-  const el = document.getElementById('secContainer');
+  var el = document.getElementById('secContainer');
   el.innerHTML = '';
-  SECTIONS.forEach(s => {
-    const on = enabled[s.id];
-    const card = document.createElement('div');
+  SECTIONS.forEach(function(s) {
+    var on = enabled[s.id];
+    var card = document.createElement('div');
     card.className = 'sec-card' + (on ? '' : ' off');
     card.id = 'card_' + s.id;
-    const bodyHtml = s.html.replace(/tbl-wrap/g, 'tbl-outer');
+    var hdrClass = 'sec-hdr open' + (s.locked ? ' locked-hdr' : '');
+    var badge = s.locked ? '<span class="lock-badge">&#128274; STANDARD</span>' : '';
+    var bodyHtml = s.html.replace(/tbl-wrap/g, 'tbl-outer');
     card.innerHTML =
-      '<div class="sec-hdr open" id="hdr_' + s.id + '" onclick="toggleBody(\'' + s.id + '\')">'
+      '<div class="' + hdrClass + '" id="hdr_' + s.id + '" onclick="toggleBody(\'' + s.id + '\')">'
       + '<h3>Section ' + s.num + ': ' + s.title + '</h3>'
+      + badge
       + '<svg class="chevron" width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>'
       + '</div>'
       + '<div class="sec-body open" id="body_' + s.id + '">' + bodyHtml + '</div>';
     el.appendChild(card);
   });
-  const doi = document.getElementById('s1_doi');
+  var doi = document.getElementById('s1_doi');
   if (doi && !doi.value) doi.valueAsDate = new Date();
   updateCount();
 }
@@ -518,7 +533,8 @@ function renderSections() {
 function setEnabled(id, val) {
   enabled[id] = val;
   document.getElementById('card_' + id).className = 'sec-card' + (val ? '' : ' off');
-  document.getElementById('sb_' + id).className = 'sb-item' + (val ? '' : ' off');
+  document.getElementById('sb_' + id).className = 'sb-item' + (val ? '' : ' off')
+    + (SECTIONS.find(function(s){return s.id===id;}).locked ? ' locked-item' : '');
   updateCount();
 }
 function toggleBody(id) {
@@ -526,14 +542,23 @@ function toggleBody(id) {
   document.getElementById('body_' + id).classList.toggle('open');
 }
 function toggleAll(open) {
-  SECTIONS.forEach(s => {
+  SECTIONS.forEach(function(s) {
     document.getElementById('hdr_' + s.id).classList.toggle('open', open);
     document.getElementById('body_' + s.id).classList.toggle('open', open);
   });
 }
-function enableAll() { SECTIONS.forEach(s => setEnabled(s.id, true)); renderSidebar(); }
-function updateCount() { document.getElementById('cnt').textContent = SECTIONS.filter(s => enabled[s.id]).length; }
-function clearForm() { if (!confirm('Clear all fields?')) return; document.querySelectorAll('input[type=text],textarea').forEach(function(e){ e.value=''; }); }
+function enableAll() { SECTIONS.forEach(function(s){ setEnabled(s.id, true); }); renderSidebar(); }
+function updateCount() { document.getElementById('cnt').textContent = SECTIONS.filter(function(s){ return enabled[s.id]; }).length; }
+function clearForm() {
+  if (!confirm('Clear all editable fields?')) return;
+  // Only clear editable (non-locked) section inputs
+  SECTIONS.forEach(function(s) {
+    if (!s.locked) {
+      var card = document.getElementById('card_' + s.id);
+      if (card) card.querySelectorAll('input[type=text],textarea').forEach(function(e){ e.value=''; });
+    }
+  });
+}
 function v(id) { var e = document.getElementById(id); return e ? e.value.trim() : ''; }
 function fmtDate(d) {
   if (!d) return '';
@@ -551,7 +576,7 @@ function generatePDF() {
   document.getElementById('statusMsg').textContent = 'Generating...';
 
   var jsPDF = window.jspdf.jsPDF;
-  var doc = new jsPDF({ unit: 'mm', format: 'a4' });
+  var doc = new jsPDF({ unit:'mm', format:'a4' });
   var PW=210, PH=297, ML=18, MR=18, CW=PW-ML-MR;
   var y=0;
 
@@ -562,11 +587,98 @@ function generatePDF() {
   var ver         = v('s1_ver');
 
   var TEAL   = [26,122,138];
+  var TEAL_D = [21,95,109];
   var ORANGE = [232,93,4];
   var BLACK  = [30,30,30];
   var WHITE  = [255,255,255];
   var LGRAY  = [200,200,200];
   var DGRAY  = [90,90,90];
+
+  // ── Locked section standard text map ──
+  var LOCKED_TEXT = {
+    's4': [
+      ['4.1','Description of first aid measures',
+       'Consult a doctor in case of discomfort.\nBy inhalation: Move the person into fresh air. If symptoms persist, seek medical attention.\nBy skin contact: Clean the affected area with water and neutral soap. If irritation occurs, seek medical advice.\nBy eye contact: Rinse with water for at least 15 minutes. Consult a doctor if problem persists.\nBy ingestion/aspiration: Do not induce vomiting. Seek medical assistance immediately for large quantities.'],
+      ['4.2','Most important symptoms and effects, both acute and delayed',
+       'Acute and delayed effects are indicated in sections 2 and 11. No significant acute effects expected under normal conditions of use.'],
+      ['4.3','Indication of any immediate medical attention and special treatment needed',
+       'Non-applicable'],
+    ],
+    's5': [
+      ['5.1.1','Suitable extinguishing media',
+       'Product is non-flammable. Any type of extinguishing agent can be used (ABC Powder, water, CO2, foam).'],
+      ['5.1.2','Unsuitable extinguishing media','Non-applicable'],
+      ['5.2','Special hazards arising from the substance or mixture',
+       'Due to its non-flammable nature, the product does not present a fire risk under normal conditions of storage, manipulation and use.'],
+      ['5.3','Advice for firefighters',
+       'Use full protective clothing and individual respiratory equipment. Refrigerate storage containers in case of fire. Act in accordance with the Internal Emergency Plan. Avoid spillage of extinguishing products into an aqueous medium.'],
+    ],
+    's6': [
+      ['6.1.1','For non-emergency personnel',
+       'Avoid raising dust. Sweep up and shovel product and place in a container for reuse or disposal. Wear appropriate PPE (see section 8).'],
+      ['6.1.2','For emergency responders',
+       'Wear full protective equipment. Keep unprotected persons away. Ensure adequate ventilation.'],
+      ['6.2','Environmental precautions',
+       'Not classified as hazardous to the environment. Keep product away from drains, surface and underground water. Do not allow to enter sewers or watercourses.'],
+      ['6.3','Methods and material for containment and cleaning up',
+       'Sweep up or vacuum spilled product. Collect in a sealed container for reuse or disposal. Clean the affected area with water.'],
+      ['6.4','Reference to other sections',
+       'See sections 8 and 13 for further information on personal protection and disposal.'],
+    ],
+    's7': [
+      ['7.1','Precautions for safe handling',
+       'Comply with current legislation on prevention of industrial risks. Maintain order and cleanliness. Do not eat, drink or smoke during use. Wash hands thoroughly after handling. Avoid generating dust. Ensure adequate ventilation.'],
+      ['7.2','Conditions for safe storage, including any incompatibilities',
+       'Store in a cool, dry, well-ventilated place away from sources of heat, radiation and static electricity. Keep containers tightly closed. Min. storage temperature: 5 C. Max. storage temperature: 30 C. Avoid contact with: strong acids, strong oxidising agents.'],
+      ['7.3','Specific end use(s)',
+       'Except for the instructions already specified it is not necessary to provide any special recommendation regarding the uses of this product. See section 1.2 for identified uses.'],
+    ],
+    's10': [
+      ['10.1','Reactivity',
+       'No hazardous reactions are expected because the product is stable under recommended storage conditions. See section 7.'],
+      ['10.2','Chemical stability',
+       'Chemically stable under the indicated conditions of storage, handling and use.'],
+      ['10.3','Possibility of hazardous reactions',
+       'Under the specified conditions, hazardous reactions that lead to excessive temperatures or pressure are not expected.'],
+      ['10.4','Conditions to avoid',
+       'Shock and friction: Not applicable. Contact with air: Not applicable. Increase in temperature: Avoid exceeding storage limits. Sunlight: Not applicable.'],
+      ['10.5','Incompatible materials',
+       'Strong acids: Avoid. Oxidising agents: Not applicable. Combustible materials: Not applicable.'],
+      ['10.6','Hazardous decomposition products',
+       'Depending on decomposition conditions, complex mixtures can be released: carbon dioxide (CO2), carbon monoxide and other organic compounds.'],
+    ],
+    's13': [
+      ['13.1.1','Disposal of the product',
+       'Consult the authorized waste service manager. Do not dispose of product into drains or the environment.'],
+      ['13.1.2','Disposal of the packaging',
+       'Containers in direct contact with the product are processed the same way as the product itself. Otherwise treated as non-dangerous residue in accordance with local regulations.'],
+      ['13.1.3','Physical/chemical properties affecting waste treatment','Non-applicable'],
+      ['13.1.4','Sewage disposal',
+       'Waste should not be disposed of to drains. See subsection 6.2.'],
+      ['13.1.5','Special precautions for waste treatment',
+       'Refer to national and local regulations on waste management.'],
+    ],
+    's14': [
+      ['14.1','UN number or ID number','Non-applicable - not classified as hazardous for transport.'],
+      ['14.2','UN proper shipping name','Not regulated'],
+      ['14.3','Transport hazard class(es)',
+       'Not applicable. Not classified as dangerous for transport per ADR/RID (Land), IMDG (Marine), ICAO/IATA (Air) and DOT.'],
+      ['14.4','Packing group','Not regulated'],
+      ['14.5','Environmental hazards','Prevent disposal into drains or watercourses.'],
+      ['14.6','Special precautions for user','Non-applicable'],
+      ['14.7','Maritime transport in bulk according to IMO instruments','Non-applicable'],
+    ],
+    's16': [
+      ['—','Legislation',
+       'This SDS has been designed in accordance with Annex 4 of the Globally Harmonized System (GHS) and COMMISSION REGULATION (EU) 2020/878.'],
+      ['—','Training advice',
+       'Minimal training is recommended to prevent industrial risks for staff using this product.'],
+      ['—','Abbreviations',
+       'ADR: European agreement on international carriage of dangerous goods by road. IMDG: International maritime dangerous goods code. IATA: International Air Transport Association. ICAO: International Civil Aviation Organisation. LD50: Lethal Dose 50. EC50: Effective concentration 50. IARC: International Agency for Research on Cancer. BCF: Bioconcentration factor. PBT: Persistent, Bioaccumulative and Toxic. vPvB: very Persistent and very Bioaccumulative.'],
+      ['—','Disclaimer',
+       'The information above is believed to be accurate and represents the best information currently available. However, we make no warranty of merchantability or any other warranty, express or implied. We assume no liability resulting from its use. Users should make their own investigations to determine the suitability of the information for their particular purposes.'],
+    ],
+  };
 
   function drawHeader() {
     doc.setFillColor(255,255,255);
@@ -601,24 +713,27 @@ function generatePDF() {
     doc.text(productName.toUpperCase(), PW-MR, PH-6, {align:'right'});
   }
 
-  function newPage() {
-    drawFooter();
-    doc.addPage();
-    drawHeader();
-  }
+  function newPage() { drawFooter(); doc.addPage(); drawHeader(); }
+  function checkY(need) { if (y+need > PH-18) newPage(); }
 
-  function checkY(need) {
-    if (y + need > PH-18) newPage();
-  }
-
-  function secBanner(sNum, title) {
+  // Banner: teal for editable, dark teal for locked
+  function secBanner(sNum, title, isLocked) {
     checkY(12);
-    doc.setFillColor(TEAL[0],TEAL[1],TEAL[2]);
+    if (isLocked) {
+      doc.setFillColor(TEAL_D[0],TEAL_D[1],TEAL_D[2]);
+    } else {
+      doc.setFillColor(TEAL[0],TEAL[1],TEAL[2]);
+    }
     doc.rect(ML, y, CW, 8, 'F');
     doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
     doc.setFont('helvetica','bold');
     doc.setFontSize(8.5);
     doc.text('SECTION ' + sNum + ': ' + title.toUpperCase(), ML+3, y+5.5);
+    if (isLocked) {
+      doc.setFontSize(7);
+      doc.setFont('helvetica','normal');
+      doc.text('[STANDARD]', PW-MR-2, y+5.5, {align:'right'});
+    }
     y += 11;
     doc.setTextColor(BLACK[0],BLACK[1],BLACK[2]);
   }
@@ -632,10 +747,9 @@ function generatePDF() {
     doc.text(numStr, ML, y);
     var lx = ML + doc.getTextWidth(numStr);
     doc.text(label, lx, y);
-    var lw = doc.getTextWidth(label);
     doc.setDrawColor(BLACK[0],BLACK[1],BLACK[2]);
     doc.setLineWidth(0.25);
-    doc.line(lx, y+0.6, lx+lw, y+0.6);
+    doc.line(lx, y+0.6, lx+doc.getTextWidth(label), y+0.6);
     y += 5.5;
     if (val) bodyText(val, 5);
   }
@@ -645,10 +759,8 @@ function generatePDF() {
     doc.setFont('helvetica','normal');
     doc.setFontSize(8.5);
     doc.setTextColor(BLACK[0],BLACK[1],BLACK[2]);
-    var numStr = num + '  ';
-    doc.text(numStr, ML, y);
-    var lx = ML + doc.getTextWidth(numStr);
-    doc.text(label, lx, y);
+    doc.text(num + '  ', ML, y);
+    doc.text(label, ML + doc.getTextWidth(num+'  '), y);
     y += 5;
     if (val) bodyText(val, 5);
   }
@@ -665,63 +777,65 @@ function generatePDF() {
 
   function gap(h) { y += (h||4); }
 
-  function drawTable(headers, rows, colRatios) {
-    var total = colRatios.reduce(function(a,b){return a+b;}, 0);
-    var colW = colRatios.map(function(r){ return (r/total)*CW; });
-    var hdrH = 11;
-    var rowH = 7;
-    checkY(hdrH + rows.length*rowH + 6);
+  // Render a locked section's standard rows in PDF
+  function renderLockedSection(sNum, title, sid) {
+    var rows = LOCKED_TEXT[sid];
+    if (!rows) return;
+    secBanner(sNum, title, true);
+    rows.forEach(function(row) {
+      var num = row[0], label = row[1], text = row[2];
+      if (num === '—') {
+        subItem('', label, text);
+      } else {
+        subItem(num+'.', label, text);
+      }
+      gap(2);
+    });
+    gap(3);
+  }
 
-    // Header
+  function drawTable(headers, rows, colRatios) {
+    var total = colRatios.reduce(function(a,b){return a+b;},0);
+    var colW = colRatios.map(function(r){return (r/total)*CW;});
+    var hdrH=11, rowH=7;
+    checkY(hdrH+rows.length*rowH+6);
     doc.setFillColor(TEAL[0],TEAL[1],TEAL[2]);
-    doc.rect(ML, y, CW, hdrH, 'F');
+    doc.rect(ML,y,CW,hdrH,'F');
     doc.setTextColor(WHITE[0],WHITE[1],WHITE[2]);
     doc.setFont('helvetica','bold');
     doc.setFontSize(7);
-    var cx = ML;
-    headers.forEach(function(h, i) {
-      var lines = doc.splitTextToSize(h, colW[i]-2);
-      lines.forEach(function(l,li){ doc.text(l, cx+1.5, y+4+li*3.2); });
-      if (i < headers.length-1) {
-        doc.setDrawColor(255,255,255);
-        doc.setLineWidth(0.2);
-        doc.line(cx+colW[i], y, cx+colW[i], y+hdrH);
-      }
-      cx += colW[i];
+    var cx=ML;
+    headers.forEach(function(h,i){
+      var lines=doc.splitTextToSize(h,colW[i]-2);
+      lines.forEach(function(l,li){doc.text(l,cx+1.5,y+4+li*3.2);});
+      if(i<headers.length-1){doc.setDrawColor(255,255,255);doc.setLineWidth(0.2);doc.line(cx+colW[i],y,cx+colW[i],y+hdrH);}
+      cx+=colW[i];
     });
-    y += hdrH;
-
-    rows.forEach(function(row, ri) {
+    y+=hdrH;
+    rows.forEach(function(row,ri){
       checkY(rowH+2);
-      doc.setFillColor(ri%2===0?255:249, ri%2===0?255:249, ri%2===0?255:249);
-      doc.rect(ML, y, CW, rowH, 'F');
+      doc.setFillColor(ri%2===0?255:249,ri%2===0?255:249,ri%2===0?255:249);
+      doc.rect(ML,y,CW,rowH,'F');
       doc.setDrawColor(LGRAY[0],LGRAY[1],LGRAY[2]);
       doc.setLineWidth(0.15);
-      doc.line(ML, y, ML+CW, y);
-      doc.setFont('helvetica','normal');
-      doc.setFontSize(7.5);
-      doc.setTextColor(BLACK[0],BLACK[1],BLACK[2]);
-      cx = ML;
-      row.forEach(function(cell, i) {
-        var lines = doc.splitTextToSize(cell||'', colW[i]-2);
-        lines.forEach(function(l,li){ doc.text(l, cx+1.5, y+4.5+li*3.5); });
-        if (i < row.length-1) {
-          doc.setDrawColor(LGRAY[0],LGRAY[1],LGRAY[2]);
-          doc.line(cx+colW[i], y, cx+colW[i], y+rowH);
-        }
-        cx += colW[i];
+      doc.line(ML,y,ML+CW,y);
+      doc.setFont('helvetica','normal');doc.setFontSize(7.5);doc.setTextColor(BLACK[0],BLACK[1],BLACK[2]);
+      cx=ML;
+      row.forEach(function(cell,i){
+        var lines=doc.splitTextToSize(cell||'',colW[i]-2);
+        lines.forEach(function(l,li){doc.text(l,cx+1.5,y+4.5+li*3.5);});
+        if(i<row.length-1){doc.setDrawColor(LGRAY[0],LGRAY[1],LGRAY[2]);doc.line(cx+colW[i],y,cx+colW[i],y+rowH);}
+        cx+=colW[i];
       });
-      y += rowH;
+      y+=rowH;
     });
-    doc.setDrawColor(LGRAY[0],LGRAY[1],LGRAY[2]);
-    doc.setLineWidth(0.15);
-    doc.line(ML, y, ML+CW, y);
+    doc.setDrawColor(LGRAY[0],LGRAY[1],LGRAY[2]);doc.setLineWidth(0.15);doc.line(ML,y,ML+CW,y);
     gap(4);
   }
 
   // Section renumbering
   var sectionNumMap = {};
-  active.forEach(function(s, idx){ sectionNumMap[s.id] = idx+1; });
+  active.forEach(function(s,idx){ sectionNumMap[s.id] = idx+1; });
 
   // Title page
   drawHeader();
@@ -731,12 +845,18 @@ function generatePDF() {
   doc.text('SAFETY DATA SHEET', PW/2, y+12, {align:'center'});
   y += 28;
 
-  // Render sections
   active.forEach(function(s) {
     var sNum = sectionNumMap[s.id];
 
+    // LOCKED SECTIONS — render from standard text
+    if (s.locked) {
+      renderLockedSection(sNum, s.title, s.id);
+      return;
+    }
+
+    // EDITABLE SECTIONS
     if (s.id === 's1') {
-      secBanner(sNum,'Identification of the Substance/Mixture and of the Company/Undertaking');
+      secBanner(sNum,'Identification of the Substance/Mixture and of the Company/Undertaking',false);
       subItem(sNum+'.1.','Product identifier:'); bodyText(productName,5); gap(2);
       subItem(sNum+'.2.','Relevant identified uses of the substance or mixture and uses advised against:');
       if(v('s1_uses')) bodyText(v('s1_uses'),5);
@@ -753,7 +873,7 @@ function generatePDF() {
       subItem(sNum+'.4.','Emergency telephone number:',v('s1_emerg')); gap(5);
     }
     else if (s.id === 's2') {
-      secBanner(sNum,'Hazards Identification');
+      secBanner(sNum,'Hazards Identification',false);
       subItem(sNum+'.1.','Classification of the substance or mixture:'); bodyText(v('s2_class'),5); gap(2);
       subItem(sNum+'.2.','Label elements:'); bodyText(v('s2_label'),5);
       if(v('s2_pict')) bodyText('Pictograms: '+v('s2_pict'),5);
@@ -761,61 +881,21 @@ function generatePDF() {
       subItem(sNum+'.3.','Other hazards:'); bodyText(v('s2_other'),5); gap(5);
     }
     else if (s.id === 's3') {
-      secBanner(sNum,'Composition/Information on Ingredients');
+      secBanner(sNum,'Composition/Information on Ingredients',false);
       subItem(sNum+'.1.','Substances:'); bodyText(v('s3_desc'),5); gap(2);
       subItem(sNum+'.2.','Mixtures:'); bodyText(v('s3_mix'),5); gap(3);
       var ingRows=[];
       for(var i=1;i<=3;i++){
-        var desc=v('i'+i+'_desc'),cas=v('i'+i+'_cas'),ec=v('i'+i+'_ec'),
-            reach=v('i'+i+'_reach')||'-',conc=v('i'+i+'_conc'),
-            pict=v('i'+i+'_pict'),haz=v('i'+i+'_haz'),hs=v('i'+i+'_hs');
-        ingRows.push([desc||'-',cas||'-',ec||'-',reach,conc||'-',pict||'-',haz||'-',hs||'-']);
+        ingRows.push([v('i'+i+'_desc')||'-',v('i'+i+'_cas')||'-',v('i'+i+'_ec')||'-',
+          v('i'+i+'_reach')||'-',v('i'+i+'_conc')||'-',v('i'+i+'_pict')||'-',
+          v('i'+i+'_haz')||'-',v('i'+i+'_hs')||'-']);
       }
       drawTable(['Description','CAS No.','EC No.','REACH Reg. No.','Conc. (%)','Pictogram / Signal Word','Hazard Class & Category','Hazard Statement'],
         ingRows,[22,15,14,17,10,17,18,17]);
       gap(2);
     }
-    else if (s.id === 's4') {
-      secBanner(sNum,'First Aid Measures');
-      subItem(sNum+'.1.','Description of first aid measures:');
-      if(v('s4_gen')) bodyText(v('s4_gen'),5);
-      if(v('s4_inh')){gap(1);bodyText('Inhalation: '+v('s4_inh'),5);}
-      if(v('s4_skin')){gap(1);bodyText('Skin contact: '+v('s4_skin'),5);}
-      if(v('s4_eye')){gap(1);bodyText('Eye contact: '+v('s4_eye'),5);}
-      if(v('s4_ing')){gap(1);bodyText('Ingestion/aspiration: '+v('s4_ing'),5);}
-      gap(2);
-      subItem(sNum+'.2.','Most important symptoms and effects, both acute and delayed:'); bodyText(v('s4_sym'),5); gap(2);
-      subItem(sNum+'.3.','Indication of any immediate medical attention and special treatment needed:'); bodyText(v('s4_med'),5); gap(5);
-    }
-    else if (s.id === 's5') {
-      secBanner(sNum,'Firefighting Measures');
-      subItem(sNum+'.1.','Extinguishing media:'); gap(1);
-      subSubItem(sNum+'.1.1.','Suitable extinguishing media:',v('s5_suit')); gap(1);
-      subSubItem(sNum+'.1.2.','Unsuitable extinguishing media:',v('s5_unsuit')); gap(2);
-      subItem(sNum+'.2.','Special hazards arising from the substance or mixture:'); bodyText(v('s5_haz'),5); gap(2);
-      subItem(sNum+'.3.','Advice for firefighters:'); bodyText(v('s5_adv'),5); gap(5);
-    }
-    else if (s.id === 's6') {
-      secBanner(sNum,'Accidental Release Measures');
-      subItem(sNum+'.1.','Personal precautions, protective equipment and emergency procedures:'); gap(1);
-      subSubItem(sNum+'.1.1.','For non-emergency personnel:',v('s6_non')); gap(1);
-      subSubItem(sNum+'.1.2.','For emergency responders:',v('s6_emr')); gap(2);
-      subItem(sNum+'.2.','Environmental precautions:'); bodyText(v('s6_env'),5); gap(2);
-      subItem(sNum+'.3.','Methods and material for containment and cleaning up:'); bodyText(v('s6_meth'),5); gap(2);
-      subItem(sNum+'.4.','Reference to other sections:'); bodyText(v('s6_ref')||'See sections 8 and 13.',5); gap(5);
-    }
-    else if (s.id === 's7') {
-      secBanner(sNum,'Handling and Storage');
-      subItem(sNum+'.1.','Precautions for safe handling:'); bodyText(v('s7_hand'),5); gap(2);
-      subItem(sNum+'.2.','Conditions for safe storage, including any incompatibilities:');
-      if(v('s7_min')||v('s7_max')) bodyText('Storage temperature: min '+v('s7_min')+'C / max '+v('s7_max')+'C',5);
-      if(v('s7_incompat')) bodyText('Incompatibilities: '+v('s7_incompat'),5);
-      if(v('s7_stor')) bodyText(v('s7_stor'),5);
-      gap(2);
-      subItem(sNum+'.3.','Specific end use(s):'); bodyText(v('s7_end'),5); gap(5);
-    }
     else if (s.id === 's8') {
-      secBanner(sNum,'Exposure Controls/Personal Protection');
+      secBanner(sNum,'Exposure Controls/Personal Protection',false);
       subItem(sNum+'.1.','Control parameters:'); gap(2);
       var dnelRows=[
         ['Consumer','Local',v('d_c_l_os'),v('d_c_l_ol'),v('d_c_l_ds'),v('d_c_l_dl'),v('d_c_l_is'),v('d_c_l_il')],
@@ -828,7 +908,7 @@ function generatePDF() {
       var pnecComps=['Freshwater','Marine water','Freshwater sediment','Marine water sediment','Sewage Treatment Plant (STP)','Intermittent release','Secondary poisoning','Soil'];
       var pnecVals=document.querySelectorAll('.pnec_val');
       var pnecNotes=document.querySelectorAll('.pnec_note');
-      var pnecRows=pnecComps.map(function(c,i){return [c, pnecVals[i]?pnecVals[i].value:'no data', pnecNotes[i]?pnecNotes[i].value:'no notes'];});
+      var pnecRows=pnecComps.map(function(c,i){return [c,pnecVals[i]?pnecVals[i].value:'no data',pnecNotes[i]?pnecNotes[i].value:'no notes'];});
       drawTable(['Compartment','Value','Note(s)'],pnecRows,[50,40,34]);
       subItem(sNum+'.2.','Exposure controls:'); gap(1);
       subSubItem(sNum+'.2.1.','Appropriate engineering controls:',v('s8_eng')); gap(1);
@@ -836,7 +916,7 @@ function generatePDF() {
       subSubItem(sNum+'.2.3.','Environmental exposure controls:',v('s8_env')); gap(5);
     }
     else if (s.id === 's9') {
-      secBanner(sNum,'Physical and Chemical Properties');
+      secBanner(sNum,'Physical and Chemical Properties',false);
       subItem(sNum+'.1.','Information on basic physical and chemical properties:'); gap(2);
       var propLabels=['Physical state','Colour','Odour, odour threshold','Melting point/freezing point',
         'Boiling point or initial boiling point and boiling range','Flammability',
@@ -853,17 +933,8 @@ function generatePDF() {
       if(v('s9_safe')){subSubItem(sNum+'.2.2.','Other safety characteristics:',v('s9_safe'));}
       gap(5);
     }
-    else if (s.id === 's10') {
-      secBanner(sNum,'Stability and Reactivity');
-      subItem(sNum+'.1.','Reactivity:'); bodyText(v('s10_r'),5); gap(2);
-      subItem(sNum+'.2.','Chemical stability:'); bodyText(v('s10_cs'),5); gap(2);
-      subItem(sNum+'.3.','Possibility of hazardous reactions:'); bodyText(v('s10_hr'),5); gap(2);
-      subItem(sNum+'.4.','Conditions to avoid:'); bodyText(v('s10_ca'),5); gap(2);
-      subItem(sNum+'.5.','Incompatible materials:'); bodyText(v('s10_im'),5); gap(2);
-      subItem(sNum+'.6.','Hazardous decomposition products:'); bodyText(v('s10_dp'),5); gap(5);
-    }
     else if (s.id === 's11') {
-      secBanner(sNum,'Toxicological Information');
+      secBanner(sNum,'Toxicological Information',false);
       subItem(sNum+'.1.','Information on hazard classes as defined in Regulation (EC) No 1272/2008:'); bodyText(v('s11_haz'),5); gap(2);
       subSubItem(sNum+'.1.1.','Summaries of the information derived from the test conducted:',v('s11_sum')); gap(1);
       subSubItem(sNum+'.1.2.','Relevant toxicological properties:',v('s11_tox')); gap(1);
@@ -875,7 +946,7 @@ function generatePDF() {
       subItem(sNum+'.2.','Information on other hazards:'); bodyText(v('s11_oth'),5); gap(5);
     }
     else if (s.id === 's12') {
-      secBanner(sNum,'Ecological Information');
+      secBanner(sNum,'Ecological Information',false);
       subItem(sNum+'.1.','Toxicity:'); bodyText(v('s12_tox')||'Not available',5); gap(2);
       subItem(sNum+'.2.','Persistence and degradability:'); bodyText(v('s12_deg')||'Not available',5); gap(2);
       subItem(sNum+'.3.','Bioaccumulative potential:'); bodyText(v('s12_bio')||'Not available',5); gap(2);
@@ -884,60 +955,14 @@ function generatePDF() {
       subItem(sNum+'.6.','Endocrine disrupting properties:'); bodyText(v('s12_end')||'Not described',5); gap(2);
       subItem(sNum+'.7.','Other adverse effects:'); bodyText(v('s12_oth')||'Not described',5); gap(5);
     }
-    else if (s.id === 's13') {
-      secBanner(sNum,'Disposal Considerations');
-      subItem(sNum+'.1.','Waste treatment methods:'); gap(1);
-      subSubItem(sNum+'.1.1.','Information regarding the disposal of the product:',v('s13_prod')); gap(1);
-      subSubItem(sNum+'.1.2.','Information regarding the disposal of the packaging:',v('s13_pack')); gap(1);
-      subSubItem(sNum+'.1.3.','Physical/chemical properties that may affect waste treatment options shall be specified:',v('s13_prop')); gap(1);
-      subSubItem(sNum+'.1.4.','Sewage disposal:',v('s13_sew')); gap(1);
-      subSubItem(sNum+'.1.5.','Special precautions for any recommended waste treatment:',v('s13_spec')); gap(5);
-    }
-    else if (s.id === 's14') {
-      secBanner(sNum,'Transport Information');
-      subItem(sNum+'.1.','UN number or ID number:',v('s14_un')||'Non-applicable'); gap(2);
-      subItem(sNum+'.2.','UN proper shipping name:',v('s14_name')||'Not regulated'); gap(2);
-      subItem(sNum+'.3.','Transport hazard class(es):'); bodyText(v('s14_class')||'Not applicable. Not classified as dangerous for transport.',5); gap(2);
-      subItem(sNum+'.4.','Packing group:',v('s14_pg')||'Not regulated'); gap(2);
-      subItem(sNum+'.5.','Environmental hazards:',v('s14_env')); gap(2);
-      subItem(sNum+'.6.','Special precautions for user:'); bodyText(v('s14_spec'),5); gap(2);
-      subItem(sNum+'.7.','Maritime transport in bulk according to IMO instruments:'); bodyText(v('s14_imo')||'Non-applicable',5); gap(5);
-    }
     else if (s.id === 's15') {
-      secBanner(sNum,'Regulatory Information');
+      secBanner(sNum,'Regulatory Information',false);
       subItem(sNum+'.1.','Safety, health and environmental regulations/legislation specific for the substance or mixture:'); bodyText(v('s15_reg'),5); gap(2);
       subItem(sNum+'.2.','Chemical safety assessment:'); bodyText(v('s15_csa'),5); gap(5);
-    }
-    else if (s.id === 's16') {
-      secBanner(sNum,'Other Information');
-      gap(3);
-      if(v('s16_leg')){bodyText(v('s16_leg'),0); gap(3);}
-      if(v('s16_abbr')){bodyText('Abbreviations: '+v('s16_abbr'),0); gap(3);}
-      if(v('s16_prep')||v('s16_help')){
-        checkY(32);
-        var bx=ML+CW*0.45, bw=CW*0.55;
-        doc.setDrawColor(LGRAY[0],LGRAY[1],LGRAY[2]); doc.setLineWidth(0.3);
-        doc.rect(bx,y,bw,28,'S');
-        doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(BLACK[0],BLACK[1],BLACK[2]);
-        doc.text('Safety data sheet was prepared by:',bx+3,y+6);
-        doc.setFont('helvetica','bold'); doc.setTextColor(ORANGE[0],ORANGE[1],ORANGE[2]);
-        var prepLines=doc.splitTextToSize(v('s16_prep')||company, bw-6);
-        prepLines.forEach(function(l,i){doc.text(l,bx+3,y+11+i*4);});
-        if(v('s16_help')){
-          doc.setFont('helvetica','normal'); doc.setTextColor(BLACK[0],BLACK[1],BLACK[2]);
-          var helpLines=doc.splitTextToSize('Professional help: '+v('s16_help'),bw-6);
-          doc.setTextColor(ORANGE[0],ORANGE[1],ORANGE[2]);
-          helpLines.forEach(function(l,i){doc.text(l,bx+3,y+20+i*4);});
-        }
-        y+=32;
-      }
-      if(v('s16_disc')){gap(3); bodyText(v('s16_disc'),0);}
-      gap(5);
     }
   });
 
   drawFooter();
-
   var fname = 'MSDS_' + productName.replace(/\s+/g,'_') + '.pdf';
   doc.save(fname);
   document.getElementById('statusMsg').textContent = 'Saved: ' + fname;
@@ -947,7 +972,6 @@ function generatePDF() {
   setTimeout(function(){ t.classList.remove('show'); }, 3000);
 }
 
-// ── INIT ──
 document.getElementById('hdrImg').src = LOGO_B64;
 renderSidebar();
 renderSections();
